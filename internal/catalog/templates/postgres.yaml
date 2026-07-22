@@ -1,0 +1,45 @@
+name: postgres
+display_name: PostgreSQL
+description: Relational database with strong consistency and rich querying.
+category: database
+
+image: postgres:17-alpine
+port: 5432
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: POSTGRES_USER
+    value: cabana
+  - name: POSTGRES_DB
+    value: cabana
+  - name: POSTGRES_PASSWORD
+    from_secret: password
+  # Postgres refuses to initialise into a non-empty directory, and a PVC mount
+  # root always contains lost+found.
+  - name: PGDATA
+    value: /var/lib/postgresql/data/pgdata
+
+storage: 5Gi
+mount_path: /var/lib/postgresql/data
+
+readiness:
+  exec: [pg_isready, -U, cabana, -d, cabana]
+
+connection:
+  env_var: DATABASE_URL
+  template: "postgres://cabana:{{.Password}}@{{.Host}}:{{.Port}}/cabana?sslmode=disable"
+
+backup:
+  # Custom format (-Fc) so restore can --clean selectively. PGPASSWORD comes from
+  # the service secret, injected by the deployer along with $BACKUP_HOST/$BACKUP_FILE.
+  dump:
+    - sh
+    - -c
+    - PGPASSWORD="$PASSWORD" pg_dump -h "$BACKUP_HOST" -U cabana -d cabana -Fc -f "$BACKUP_FILE"
+  restore:
+    - sh
+    - -c
+    - PGPASSWORD="$PASSWORD" pg_restore -h "$BACKUP_HOST" -U cabana -d cabana --clean --if-exists --no-owner "$BACKUP_FILE"

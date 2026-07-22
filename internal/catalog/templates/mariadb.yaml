@@ -1,0 +1,43 @@
+name: mariadb
+display_name: MariaDB
+description: Drop-in MySQL replacement, community-governed.
+category: database
+
+image: mariadb:11.6
+port: 3306
+
+secrets:
+  - key: password
+    generate: password
+  - key: root_password
+    generate: password
+
+env:
+  - name: MARIADB_DATABASE
+    value: cabana
+  - name: MARIADB_USER
+    value: cabana
+  - name: MARIADB_PASSWORD
+    from_secret: password
+  - name: MARIADB_ROOT_PASSWORD
+    from_secret: root_password
+
+storage: 5Gi
+mount_path: /var/lib/mysql
+
+readiness:
+  exec: [healthcheck.sh, --connect, --innodb_initialized]
+
+connection:
+  env_var: DATABASE_URL
+  template: "mysql://cabana:{{.Password}}@{{.Host}}:{{.Port}}/cabana"
+
+backup:
+  dump:
+    - sh
+    - -c
+    - mariadb-dump -h "$BACKUP_HOST" -u cabana -p"$PASSWORD" --databases cabana > "$BACKUP_FILE"
+  restore:
+    - sh
+    - -c
+    - mariadb -h "$BACKUP_HOST" -u cabana -p"$PASSWORD" < "$BACKUP_FILE"

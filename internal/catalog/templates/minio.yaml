@@ -1,0 +1,36 @@
+name: minio
+display_name: MinIO
+description: S3-compatible object storage for files and backups.
+category: storage
+
+image: minio/minio:RELEASE.2024-10-13T13-34-11Z
+port: 9000
+
+extra_ports:
+  # The web console, which the --console-address flag below binds.
+  - name: console
+    port: 9001
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: MINIO_ROOT_USER
+    value: cabana
+  - name: MINIO_ROOT_PASSWORD
+    from_secret: password
+
+command: [minio, server, /data, --console-address, ":9001"]
+
+storage: 10Gi
+mount_path: /data
+
+readiness:
+  http_path: /minio/health/live
+
+connection:
+  env_var: S3_ENDPOINT
+  # Access key and secret are exposed separately in the credentials view; the
+  # endpoint is what an S3 client needs first.
+  template: "http://{{.Host}}:{{.Port}}"

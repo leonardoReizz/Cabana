@@ -1,0 +1,29 @@
+name: meilisearch
+display_name: Meilisearch
+description: Typo-tolerant full-text search, tuned for instant results.
+category: search
+
+image: getmeili/meilisearch:v1.11
+port: 7700
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: MEILI_MASTER_KEY
+    from_secret: password
+  - name: MEILI_ENV
+    value: production
+
+storage: 5Gi
+mount_path: /meili_data
+
+readiness:
+  http_path: /health
+
+connection:
+  env_var: MEILISEARCH_URL
+  # The key travels separately: Meilisearch expects it in an Authorization
+  # header, not in the URL. It is on the credentials page as `password`.
+  template: "http://{{.Host}}:{{.Port}}"

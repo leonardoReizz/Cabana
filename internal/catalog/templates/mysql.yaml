@@ -1,0 +1,43 @@
+name: mysql
+display_name: MySQL
+description: The most widely deployed relational database.
+category: database
+
+image: mysql:8.4
+port: 3306
+
+secrets:
+  - key: password
+    generate: password
+  - key: root_password
+    generate: password
+
+env:
+  - name: MYSQL_DATABASE
+    value: cabana
+  - name: MYSQL_USER
+    value: cabana
+  - name: MYSQL_PASSWORD
+    from_secret: password
+  - name: MYSQL_ROOT_PASSWORD
+    from_secret: root_password
+
+storage: 5Gi
+mount_path: /var/lib/mysql
+
+readiness:
+  exec: [mysqladmin, ping, -h, "127.0.0.1"]
+
+connection:
+  env_var: DATABASE_URL
+  template: "mysql://cabana:{{.Password}}@{{.Host}}:{{.Port}}/cabana"
+
+backup:
+  dump:
+    - sh
+    - -c
+    - mysqldump -h "$BACKUP_HOST" -u cabana -p"$PASSWORD" --databases cabana > "$BACKUP_FILE"
+  restore:
+    - sh
+    - -c
+    - mysql -h "$BACKUP_HOST" -u cabana -p"$PASSWORD" < "$BACKUP_FILE"

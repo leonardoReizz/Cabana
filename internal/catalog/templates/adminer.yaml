@@ -1,0 +1,17 @@
+name: adminer
+display_name: Adminer
+description: Web UI for browsing and querying your databases. One PHP file, no setup.
+category: tools
+
+image: adminer:4.8.1-standalone
+port: 8080
+
+# No storage and no credentials of its own: Adminer holds nothing and
+# authenticates against whichever database you point it at.
+
+readiness:
+  http_path: /
+
+connection:
+  env_var: ADMINER_URL
+  template: "http://{{.Host}}:{{.Port}}"

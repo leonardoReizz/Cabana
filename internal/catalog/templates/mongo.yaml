@@ -1,0 +1,35 @@
+name: mongo
+display_name: MongoDB
+description: Document database for schema-flexible data.
+category: database
+
+image: mongo:8.0
+port: 27017
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: MONGO_INITDB_ROOT_USERNAME
+    value: cabana
+  - name: MONGO_INITDB_ROOT_PASSWORD
+    from_secret: password
+
+storage: 5Gi
+mount_path: /data/db
+
+connection:
+  env_var: MONGO_URL
+  # authSource=admin because the root user is created in the admin database.
+  template: "mongodb://cabana:{{.Password}}@{{.Host}}:{{.Port}}/?authSource=admin"
+
+backup:
+  dump:
+    - sh
+    - -c
+    - mongodump --host "$BACKUP_HOST" -u cabana -p "$PASSWORD" --authenticationDatabase admin --archive="$BACKUP_FILE"
+  restore:
+    - sh
+    - -c
+    - mongorestore --host "$BACKUP_HOST" -u cabana -p "$PASSWORD" --authenticationDatabase admin --drop --archive="$BACKUP_FILE"

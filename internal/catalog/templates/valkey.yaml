@@ -1,0 +1,30 @@
+name: valkey
+display_name: Valkey
+description: Redis-compatible key-value store, maintained by the Linux Foundation.
+category: cache
+
+image: valkey/valkey:8.0-alpine
+port: 6379
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: VALKEY_PASSWORD
+    from_secret: password
+
+command:
+  - valkey-server
+  - --requirepass
+  - $(VALKEY_PASSWORD)
+  - --appendonly
+  - "yes"
+
+storage: 1Gi
+mount_path: /data
+
+connection:
+  env_var: REDIS_URL
+  # Redis protocol, so every Redis client works unchanged.
+  template: "redis://:{{.Password}}@{{.Host}}:{{.Port}}"

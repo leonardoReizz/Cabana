@@ -1,0 +1,27 @@
+name: rabbitmq
+display_name: RabbitMQ
+description: Message broker for queues and background jobs.
+category: messaging
+
+image: rabbitmq:4.0-alpine
+port: 5672
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: RABBITMQ_DEFAULT_USER
+    value: cabana
+  - name: RABBITMQ_DEFAULT_PASS
+    from_secret: password
+
+storage: 1Gi
+mount_path: /var/lib/rabbitmq
+
+readiness:
+  exec: [rabbitmq-diagnostics, -q, ping]
+
+connection:
+  env_var: RABBITMQ_URL
+  template: "amqp://cabana:{{.Password}}@{{.Host}}:{{.Port}}/"

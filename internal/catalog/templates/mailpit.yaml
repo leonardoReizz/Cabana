@@ -1,0 +1,31 @@
+name: mailpit
+display_name: Mailpit
+description: Catches every email your app sends and shows them in a web inbox. Nothing is delivered.
+category: tools
+
+image: axllent/mailpit:v1.21
+port: 1025
+
+extra_ports:
+  - name: web
+    port: 8025
+
+env:
+  - name: MP_SMTP_AUTH_ACCEPT_ANY
+    value: "1"
+  - name: MP_SMTP_AUTH_ALLOW_INSECURE
+    value: "1"
+
+# No storage: a test mail catcher that survived restarts would just accumulate
+# stale test messages.
+
+readiness:
+  # The web port: 1025 speaks SMTP and would never answer an HTTP probe.
+  http_path: /readyz
+  port: 8025
+
+connection:
+  env_var: SMTP_URL
+  # No credentials: it accepts any login, since nothing it receives leaves the
+  # cluster.
+  template: "smtp://{{.Host}}:{{.Port}}"

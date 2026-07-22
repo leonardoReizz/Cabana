@@ -1,0 +1,38 @@
+name: clickhouse
+display_name: ClickHouse
+description: Columnar database built for fast analytical queries over large tables.
+category: database
+
+image: clickhouse/clickhouse-server:24.8-alpine
+port: 8123
+
+extra_ports:
+  # The native TCP protocol, faster than HTTP for clients that speak it.
+  - name: native
+    port: 9000
+
+# StatefulSet for stable storage identity: a columnar store's data files must
+# stay bound to the same volume across restarts.
+workload: statefulset
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: CLICKHOUSE_USER
+    value: cabana
+  - name: CLICKHOUSE_DB
+    value: cabana
+  - name: CLICKHOUSE_PASSWORD
+    from_secret: password
+
+storage: 5Gi
+mount_path: /var/lib/clickhouse
+
+readiness:
+  http_path: /ping
+
+connection:
+  env_var: CLICKHOUSE_URL
+  template: "http://cabana:{{.Password}}@{{.PodHost}}:{{.Port}}/"

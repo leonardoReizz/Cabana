@@ -1,0 +1,16 @@
+name: memcached
+display_name: Memcached
+description: In-memory cache. Deliberately forgets everything on restart.
+category: cache
+
+image: memcached:1.6-alpine
+port: 11211
+
+# No storage: memcached is a cache by definition, and a volume would only make
+# restarts slower without preserving anything — it holds nothing on disk.
+
+connection:
+  env_var: MEMCACHED_URL
+  # No authentication: memcached has none in this mode, and it is reachable only
+  # from inside the cluster.
+  template: "{{.Host}}:{{.Port}}"

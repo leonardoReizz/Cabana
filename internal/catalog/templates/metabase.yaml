@@ -1,0 +1,39 @@
+name: metabase
+display_name: Metabase
+description: Business-intelligence dashboards over your databases. Backed by its own Postgres.
+category: tools
+
+image: metabase/metabase:v0.51.11
+port: 3000
+
+# Metabase stores its own state in a database. Without one it falls back to an
+# embedded H2 file that is explicitly not for real use, so cabana gives it a
+# Postgres and wires the connection in.
+requires:
+  - name: db
+    template: postgres
+    inject:
+      - env: MB_DB_HOST
+        from: host
+      - env: MB_DB_PASS
+        from: password
+      - env: MB_DB_PORT
+        from: port
+
+env:
+  - name: MB_DB_TYPE
+    value: postgres
+  # Match the database and user the postgres template creates.
+  - name: MB_DB_DBNAME
+    value: cabana
+  - name: MB_DB_USER
+    value: cabana
+
+# No storage of its own: everything durable lives in the Postgres dependency.
+
+readiness:
+  http_path: /api/health
+
+connection:
+  env_var: METABASE_URL
+  template: "http://{{.Host}}:{{.Port}}"

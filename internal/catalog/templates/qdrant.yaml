@@ -1,0 +1,29 @@
+name: qdrant
+display_name: Qdrant
+description: Vector database for embeddings and similarity search.
+category: search
+
+image: qdrant/qdrant:v1.12.4
+port: 6333
+
+extra_ports:
+  - name: grpc
+    port: 6334
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: QDRANT__SERVICE__API_KEY
+    from_secret: password
+
+storage: 5Gi
+mount_path: /qdrant/storage
+
+readiness:
+  http_path: /healthz
+
+connection:
+  env_var: QDRANT_URL
+  template: "http://{{.Host}}:{{.Port}}"

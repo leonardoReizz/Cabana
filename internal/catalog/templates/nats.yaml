@@ -1,0 +1,43 @@
+name: nats
+display_name: NATS
+description: Lightweight messaging for services that need to talk to each other.
+category: messaging
+
+image: nats:2.10-alpine
+port: 4222
+
+extra_ports:
+  - name: monitoring
+    port: 8222
+
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: NATS_PASSWORD
+    from_secret: password
+
+# The password is read from $NATS_PASSWORD by the shell here, because
+# Kubernetes only expands $(VAR) for plain env values — never for a value that
+# comes from a Secret, which this one does. Referencing $(NATS_PASSWORD) in the
+# args instead leaves the literal string in place and every client fails to
+# authenticate.
+command:
+  - /bin/sh
+  - -c
+  - >
+    exec nats-server --jetstream --store_dir /data
+    --user cabana --pass "$NATS_PASSWORD"
+    --http_port 8222
+
+storage: 1Gi
+mount_path: /data
+
+readiness:
+  http_path: /healthz
+  port: 8222
+
+connection:
+  env_var: NATS_URL
+  template: "nats://cabana:{{.Password}}@{{.Host}}:{{.Port}}"

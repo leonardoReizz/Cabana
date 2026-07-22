@@ -1,0 +1,38 @@
+# Service templates are data, not code: adding a service to the catalogue means
+# adding a file here, and nothing else. They are embedded into the binary at
+# build time so an install has the catalogue without network access.
+name: redis
+display_name: Redis
+description: In-memory data store, used for caching, queues and sessions.
+category: cache
+
+image: redis:7.4-alpine
+port: 6379
+
+# Generated once at install time and never shown again except through the
+# service's own credentials view.
+secrets:
+  - key: password
+    generate: password
+
+env:
+  - name: REDIS_PASSWORD
+    from_secret: password
+
+# $(VAR) is Kubernetes' own substitution, resolved from env above — the password
+# never appears in the manifest itself.
+command:
+  - redis-server
+  - --requirepass
+  - $(REDIS_PASSWORD)
+  - --appendonly
+  - "yes"
+
+storage: 1Gi
+mount_path: /data
+
+# What a linked app receives. The variable name is the convention every Redis
+# client already looks for.
+connection:
+  env_var: REDIS_URL
+  template: "redis://:{{.Password}}@{{.Host}}:{{.Port}}"
