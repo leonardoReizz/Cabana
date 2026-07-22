@@ -1,0 +1,53 @@
+# cert-manager ClusterIssuers.
+#
+# Three, because they serve different situations and the wrong one is expensive:
+#
+#   letsencrypt          real certificates, and a rate limit you can exhaust
+#                        (5 per domain per week) while debugging
+#   letsencrypt-staging  untrusted certificates from a generous rate limit —
+#                        the right one to prove DNS and reachability work
+#                        before switching to production
+#   selfsigned           no ACME at all, so it works with no public DNS. Used
+#                        for local development, and the only issuer that can be
+#                        verified end to end without a public host.
+#
+# The ACME email is substituted by the installer, which is why this file is a
+# template rather than something you can apply directly.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cabana-letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: __ACME_EMAIL__
+    privateKeySecretRef:
+      name: cabana-letsencrypt-account
+    solvers:
+      # HTTP-01 over the same Traefik that already serves the apps. It needs the
+      # hostname to resolve publicly to this machine and port 80 to be open.
+      - http01:
+          ingress:
+            class: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cabana-letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: __ACME_EMAIL__
+    privateKeySecretRef:
+      name: cabana-letsencrypt-staging-account
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cabana-selfsigned
+spec:
+  selfSigned: {}

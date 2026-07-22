@@ -1,0 +1,95 @@
+# cabana's own state: users, apps, env vars, deploy history.
+#
+# It runs inside the cluster so the installer has nothing to provision on the
+# host, and is exposed on a NodePort because cabana itself runs as a systemd
+# unit on the host — outside the cluster, where cluster DNS does not resolve.
+#
+# The credentials come from the cabana-postgres Secret, which the installer
+# creates with a generated password before applying this file.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cabana-postgres
+  namespace: cabana-system
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cabana-postgres
+  namespace: cabana-system
+  labels:
+    app.kubernetes.io/name: cabana-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cabana-postgres
+  strategy:
+    # A database on a ReadWriteOnce volume must never have two pods at once.
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cabana-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: cabana
+            - name: POSTGRES_DB
+              value: cabana
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cabana-postgres
+                  key: password
+            # Postgres refuses to initialise into a non-empty directory, and a
+            # PVC mount root always contains lost+found.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: [pg_isready, -U, cabana, -d, cabana]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: [pg_isready, -U, cabana, -d, cabana]
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cabana-postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cabana-postgres
+  namespace: cabana-system
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: cabana-postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      nodePort: 30432

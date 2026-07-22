@@ -1,0 +1,16 @@
+# K3s containerd registry configuration.
+#
+# containerd runs on the host, outside the cluster, so it cannot resolve
+# cluster DNS. This maps the registry's in-cluster name — the name baked into
+# every image reference cabana produces — to the NodePort where the same
+# registry is reachable from the node itself.
+#
+# Plain HTTP is safe here: the endpoint is 127.0.0.1 and the traffic never
+# leaves the node.
+#
+# In production the installer writes this to /etc/rancher/k3s/registries.yaml
+# before starting K3s. In development k3d takes it via --registry-config.
+mirrors:
+  "cabana-registry.cabana-system.svc.cluster.local:5000":
+    endpoint:
+      - "http://127.0.0.1:30500"

@@ -1,0 +1,89 @@
+# The in-cluster image registry. Every app image cabana builds is pushed here by
+# a BuildKit Job and pulled back out by the node's containerd.
+#
+# It is reachable two ways, and both are needed:
+#   - ClusterIP DNS  (cabana-registry.cabana-system.svc.cluster.local:5000)
+#     for the BuildKit pod pushing from inside the cluster.
+#   - NodePort 30500 for containerd, which runs on the host and cannot resolve
+#     cluster DNS. registries.yaml maps the DNS name to this port.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cabana-system
+  labels:
+    app.kubernetes.io/managed-by: cabana
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cabana-registry
+  namespace: cabana-system
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cabana-registry
+  namespace: cabana-system
+  labels:
+    app.kubernetes.io/name: cabana-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cabana-registry
+  strategy:
+    # The registry owns a ReadWriteOnce volume, so the old pod must release it
+    # before the new one can start.
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cabana-registry
+    spec:
+      containers:
+        - name: registry
+          image: registry:2.8.3
+          ports:
+            - name: registry
+              containerPort: 5000
+          env:
+            # Lets a re-pushed tag overwrite the old one; without it a rebuild
+            # of the same deploy ID would fail.
+            - name: REGISTRY_STORAGE_DELETE_ENABLED
+              value: "true"
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/registry
+          readinessProbe:
+            httpGet:
+              path: /v2/
+              port: registry
+            initialDelaySeconds: 2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: cabana-registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cabana-registry
+  namespace: cabana-system
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: cabana-registry
+  ports:
+    - name: registry
+      port: 5000
+      targetPort: 5000
+      nodePort: 30500

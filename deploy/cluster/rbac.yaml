@@ -1,0 +1,56 @@
+# Permissions cabana needs when it runs inside the cluster.
+#
+# The grant is cluster-wide because cabana creates a namespace per app, so it
+# cannot be scoped to a fixed set up front. It is still narrow by verb and by
+# resource: cabana never touches nodes, RBAC, CRDs, or anything in kube-system.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cabana
+  namespace: cabana-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cabana
+rules:
+  # One namespace per app is how cabana isolates and tears down workloads.
+  - apiGroups: [""]
+    resources: [namespaces]
+    verbs: [get, list, watch, create, delete]
+
+  # Env vars live in a Secret; the Service fronts the app's pods.
+  - apiGroups: [""]
+    resources: [secrets, services]
+    verbs: [get, list, watch, create, update, patch, delete]
+
+  # pods/log backs both the build output and the live app log stream.
+  - apiGroups: [""]
+    resources: [pods, pods/log]
+    verbs: [get, list, watch]
+
+  - apiGroups: [apps]
+    resources: [deployments]
+    verbs: [get, list, watch, create, update, patch, delete]
+
+  # Builds run as one-shot Jobs.
+  - apiGroups: [batch]
+    resources: [jobs]
+    verbs: [get, list, watch, create, delete]
+
+  - apiGroups: [networking.k8s.io]
+    resources: [ingresses]
+    verbs: [get, list, watch, create, update, patch, delete]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cabana
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cabana
+subjects:
+  - kind: ServiceAccount
+    name: cabana
+    namespace: cabana-system
