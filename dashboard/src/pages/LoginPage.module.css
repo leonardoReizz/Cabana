@@ -1,0 +1,68 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  /* A faint ember glow behind the card — the one decorative flourish in the
+   * whole app, and it only appears on the screen with nothing else on it. */
+  background:
+    radial-gradient(
+      ellipse 60% 50% at 50% 0%,
+      var(--accent-subtle-bg),
+      transparent 70%
+    ),
+    var(--bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 22rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wide);
+}
+
+.tagline {
+  margin-bottom: var(--space-6);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.error {
+  padding: var(--space-3);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+.footnote {
+  margin-top: var(--space-5);
+  color: var(--text-subtle);
+  font-size: var(--text-xs);
+  text-align: center;
+}
+
+.footnote code {
+  color: var(--text-muted);
+}

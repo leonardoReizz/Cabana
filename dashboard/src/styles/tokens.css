@@ -1,0 +1,225 @@
+/*
+ * cabana design tokens
+ *
+ * Two layers, and the distinction matters:
+ *   1. Primitives (--cbn-ember-500, --cbn-sand-800) — raw values, never used
+ *      directly in a component.
+ *   2. Semantic tokens (--surface, --text-muted, --accent) — what components
+ *      actually reference. Swapping a theme means remapping this layer only.
+ *
+ * The palette is deliberately warm. A PaaS you install on your own machine is a
+ * shelter, not an enterprise console, and the warmth is what separates cabana
+ * on sight from every blue-grey dev tool.
+ */
+
+:root {
+  /* ---- primitives: ember (brand accent) ---- */
+  --cbn-ember-50: #fef3ee;
+  --cbn-ember-100: #fde3d6;
+  --cbn-ember-200: #fac5ad;
+  --cbn-ember-300: #f49f7b;
+  --cbn-ember-400: #ec7a4f;
+  --cbn-ember-500: #e05a2b;
+  --cbn-ember-600: #c0441c;
+  --cbn-ember-700: #9a3517;
+  --cbn-ember-800: #742818;
+  --cbn-ember-900: #4e1c12;
+
+  /* ---- primitives: sand (warm neutral ramp) ---- */
+  --cbn-sand-0: #ffffff;
+  --cbn-sand-25: #fdfbf8;
+  --cbn-sand-50: #f7f3ee;
+  --cbn-sand-100: #efe9e1;
+  --cbn-sand-200: #dfd6ca;
+  --cbn-sand-300: #c4b8a8;
+  --cbn-sand-400: #9c8e7c;
+  --cbn-sand-500: #766a5a;
+  --cbn-sand-600: #574e42;
+  --cbn-sand-700: #3d362d;
+  --cbn-sand-800: #292420;
+  --cbn-sand-900: #1a1613;
+  --cbn-sand-950: #100e0c;
+
+  /* ---- primitives: status ---- */
+  --cbn-moss-400: #4fb27a;
+  --cbn-moss-500: #3f9e63;
+  --cbn-moss-900: #16301f;
+  --cbn-amber-400: #d9a13c;
+  --cbn-amber-500: #c08728;
+  --cbn-amber-900: #362713;
+  --cbn-rust-400: #e0625c;
+  --cbn-rust-500: #cc4640;
+  --cbn-rust-900: #3a1917;
+
+  /* ---- type ---- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  /* Mono carries IDs, hostnames, env vars and logs — the technical texture. */
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, 'JetBrains Mono',
+    'Fira Code', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.55;
+
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* Applied to wordmarks and section labels; part of the brand voice. */
+  --tracking-wide: 0.08em;
+
+  /* ---- space: 4px base, named by step so layouts stay on the grid ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* ---- shape ---- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+
+  --border-width: 1px;
+
+  /* ---- motion: short and eased-out; the UI should feel immediate ---- */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+
+  --layout-max: 1120px;
+  --z-toast: 100;
+}
+
+/* ---- semantic layer: light ---- */
+:root {
+  color-scheme: light;
+
+  --bg: var(--cbn-sand-50);
+  --surface: var(--cbn-sand-0);
+  --surface-raised: var(--cbn-sand-25);
+  --surface-sunken: var(--cbn-sand-100);
+  --surface-inverse: var(--cbn-sand-900);
+
+  --border: var(--cbn-sand-200);
+  --border-strong: var(--cbn-sand-300);
+
+  --text: var(--cbn-sand-900);
+  --text-muted: var(--cbn-sand-500);
+  --text-subtle: var(--cbn-sand-400);
+  --text-inverse: var(--cbn-sand-25);
+
+  --accent: var(--cbn-ember-600);
+  --accent-hover: var(--cbn-ember-700);
+  --accent-text: var(--cbn-sand-0);
+  --accent-subtle-bg: var(--cbn-ember-50);
+  --accent-subtle-text: var(--cbn-ember-700);
+
+  --success-bg: #e8f5ec;
+  --success-text: #1f6b3d;
+  --warning-bg: #fbf1dd;
+  --warning-text: #7a5410;
+  --danger-bg: #fdeceb;
+  --danger-text: #a5302b;
+  --danger-solid: var(--cbn-rust-500);
+
+  --focus-ring: var(--cbn-ember-500);
+
+  --shadow-sm: 0 1px 2px rgb(26 22 19 / 0.06);
+  --shadow-md: 0 2px 4px rgb(26 22 19 / 0.06), 0 8px 16px -6px rgb(26 22 19 / 0.1);
+  --shadow-lg: 0 4px 8px rgb(26 22 19 / 0.08), 0 20px 40px -12px rgb(26 22 19 / 0.18);
+}
+
+/* ---- semantic layer: dark ----
+ * Dark is the default expectation for a dev tool, so it follows the OS unless
+ * the user overrides it with the toggle (which stamps data-theme on <html>). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --bg: var(--cbn-sand-950);
+    --surface: var(--cbn-sand-900);
+    --surface-raised: var(--cbn-sand-800);
+    --surface-sunken: #0b0a09;
+    --surface-inverse: var(--cbn-sand-50);
+
+    --border: #2f2924;
+    --border-strong: #443c34;
+
+    --text: var(--cbn-sand-50);
+    --text-muted: var(--cbn-sand-300);
+    --text-subtle: var(--cbn-sand-400);
+    --text-inverse: var(--cbn-sand-950);
+
+    --accent: var(--cbn-ember-500);
+    --accent-hover: var(--cbn-ember-400);
+    --accent-text: #ffffff;
+    --accent-subtle-bg: #331709;
+    --accent-subtle-text: var(--cbn-ember-300);
+
+    --success-bg: var(--cbn-moss-900);
+    --success-text: var(--cbn-moss-400);
+    --warning-bg: var(--cbn-amber-900);
+    --warning-text: var(--cbn-amber-400);
+    --danger-bg: var(--cbn-rust-900);
+    --danger-text: var(--cbn-rust-400);
+    --danger-solid: var(--cbn-rust-500);
+
+    --focus-ring: var(--cbn-ember-400);
+
+    --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+    --shadow-md: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45);
+    --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.35), 0 20px 40px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+/* Explicit dark override duplicates the block above so the toggle wins over the
+ * OS preference in both directions. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --bg: var(--cbn-sand-950);
+  --surface: var(--cbn-sand-900);
+  --surface-raised: var(--cbn-sand-800);
+  --surface-sunken: #0b0a09;
+  --surface-inverse: var(--cbn-sand-50);
+
+  --border: #2f2924;
+  --border-strong: #443c34;
+
+  --text: var(--cbn-sand-50);
+  --text-muted: var(--cbn-sand-300);
+  --text-subtle: var(--cbn-sand-400);
+  --text-inverse: var(--cbn-sand-950);
+
+  --accent: var(--cbn-ember-500);
+  --accent-hover: var(--cbn-ember-400);
+  --accent-text: #ffffff;
+  --accent-subtle-bg: #331709;
+  --accent-subtle-text: var(--cbn-ember-300);
+
+  --success-bg: var(--cbn-moss-900);
+  --success-text: var(--cbn-moss-400);
+  --warning-bg: var(--cbn-amber-900);
+  --warning-text: var(--cbn-amber-400);
+  --danger-bg: var(--cbn-rust-900);
+  --danger-text: var(--cbn-rust-400);
+  --danger-solid: var(--cbn-rust-500);
+
+  --focus-ring: var(--cbn-ember-400);
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.3), 0 8px 16px -6px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 4px 8px rgb(0 0 0 / 0.35), 0 20px 40px -12px rgb(0 0 0 / 0.6);
+}

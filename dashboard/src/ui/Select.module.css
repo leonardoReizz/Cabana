@@ -1,0 +1,96 @@
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  height: 2rem;
+  padding: 0 var(--space-3);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.trigger:hover:not(:disabled) {
+  border-color: var(--text-subtle);
+}
+
+.trigger:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.trigger[data-placeholder] {
+  color: var(--text-subtle);
+}
+
+.icon {
+  color: var(--text-subtle);
+  font-size: 0.65em;
+}
+
+.content {
+  z-index: 60;
+  overflow: hidden;
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  /* Radix measures the trigger and exposes it; matching the width keeps the
+   * menu from jumping to a different size than the control it came from. */
+  min-width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
+}
+
+.viewport {
+  padding: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+
+/* Radix drives highlight from keyboard and pointer alike, so one rule covers
+ * both instead of :hover and :focus disagreeing. */
+.item[data-highlighted] {
+  background: var(--surface-sunken);
+}
+
+.item[data-state='checked'] {
+  color: var(--accent);
+}
+
+.item[data-disabled] {
+  color: var(--text-subtle);
+  pointer-events: none;
+}
+
+.indicator {
+  width: 1em;
+  flex-shrink: 0;
+}
+
+.scrollButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 1.25rem;
+  background: var(--surface);
+  color: var(--text-subtle);
+  font-size: var(--text-xs);
+  cursor: default;
+}

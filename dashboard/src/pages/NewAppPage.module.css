@@ -1,0 +1,352 @@
+/* Two columns: steps stay visible on the left while the form works on the
+ * right. The single stretched column this replaced put a 3-field form across
+ * the full page width, which reads as an empty screen with inputs in it. */
+.layout {
+  display: grid;
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+  max-width: 58rem;
+}
+
+/* ---- left rail ---- */
+.rail {
+  position: sticky;
+  top: 5rem;
+}
+
+.railHead {
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  margin-top: var(--space-1);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--text-subtle);
+  font-size: var(--text-sm);
+  text-align: left;
+  background: none;
+  border: none;
+  width: 100%;
+}
+
+/* Visited steps are clickable; the ones ahead are not. */
+.stepClickable {
+  cursor: pointer;
+}
+
+.stepClickable:hover {
+  background: var(--surface-sunken);
+  color: var(--text);
+}
+
+.stepCurrent {
+  background: var(--surface-sunken);
+  color: var(--text);
+  font-weight: var(--weight-medium);
+}
+
+.stepDone {
+  color: var(--text-muted);
+}
+
+/* The marker carries state; the label just names it. */
+.marker {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: var(--border-width) solid var(--border-strong);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--duration-normal) var(--ease-out),
+    border-color var(--duration-normal) var(--ease-out),
+    color var(--duration-normal) var(--ease-out);
+}
+
+.stepCurrent .marker {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.stepDone .marker {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+/* ---- right panel ---- */
+.panel {
+  padding: var(--space-6);
+  background: var(--surface);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  /* Keeps the panel from resizing as steps of different heights swap in,
+   * which would make the whole page jump on every Continue. */
+  min-height: 26rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepBody {
+  flex: 1;
+}
+
+.stepTitle {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-2);
+}
+
+.stepLede {
+  margin-bottom: var(--space-5);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
+
+.note {
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent-subtle-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  color: var(--accent-subtle-text);
+  font-size: var(--text-sm);
+}
+
+.note code {
+  background: none;
+  padding: 0;
+  border: none;
+  font-weight: var(--weight-medium);
+  color: inherit;
+}
+
+.warning {
+  padding: var(--space-3) var(--space-4);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+.error {
+  padding: var(--space-3);
+  margin-top: var(--space-4);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+}
+
+/* ---- key/value editor ---- */
+.pairs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pairRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) auto;
+  gap: var(--space-2);
+}
+
+.pairInput {
+  height: 2.25rem;
+  padding: 0 var(--space-3);
+  background: var(--surface-sunken);
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.pairInput:hover {
+  border-color: var(--border-strong);
+}
+
+.pairInvalid {
+  border-color: var(--danger-solid);
+}
+
+.pairEmpty {
+  padding: var(--space-5);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  text-align: center;
+  border: var(--border-width) dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}
+
+.fieldError {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--danger-text);
+}
+
+/* ---- service picker ---- */
+.serviceList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.serviceOption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--surface-sunken);
+  border: var(--border-width) solid transparent;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out);
+}
+
+.serviceOption:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-subtle-bg);
+}
+
+.serviceMeta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-subtle);
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+
+/* ---- review ---- */
+.review {
+  display: flex;
+  flex-direction: column;
+}
+
+.reviewRow {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: var(--border-width) solid var(--border);
+  font-size: var(--text-sm);
+}
+
+.reviewRow:last-child {
+  border-bottom: none;
+}
+
+.reviewLabel {
+  color: var(--text-muted);
+}
+
+.reviewValue {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  word-break: break-word;
+}
+
+.reviewMuted {
+  color: var(--text-subtle);
+}
+
+/* ---- actions ---- */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: var(--border-width) solid var(--border);
+}
+
+.actionsRight {
+  display: flex;
+  gap: var(--space-2);
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .rail {
+    position: static;
+  }
+
+  /* Horizontal on narrow screens, where a vertical rail would push the form
+   * below the fold. */
+  .steps {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .step {
+    width: auto;
+    white-space: nowrap;
+  }
+
+  .panel {
+    padding: var(--space-4);
+    min-height: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .pairRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .reviewRow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-1);
+  }
+}
