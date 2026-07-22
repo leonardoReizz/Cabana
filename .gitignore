@@ -1,0 +1,13 @@
+/bin/
+node_modules/
+*.tsbuildinfo
+.env
+.env.local
+
+# Built dashboard: generated into the Go embed path by `make dashboard`.
+# The placeholder index.html is committed so `go build` works on a clean clone.
+/internal/web/dist/*
+!/internal/web/dist/index.html
+
+# Local working notes: project context (CLAUDE.md) and roadmap. Never committed.
+/.notes/

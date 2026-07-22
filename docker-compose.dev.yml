@@ -1,0 +1,22 @@
+# Development dependencies only. In production the installer runs Postgres
+# inside the K3s cluster; nothing here ships to a user's machine.
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: cabana-dev-postgres
+    environment:
+      POSTGRES_USER: cabana
+      POSTGRES_PASSWORD: cabana
+      POSTGRES_DB: cabana
+    ports:
+      - "5433:5432"
+    volumes:
+      - cabana-dev-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cabana -d cabana"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  cabana-dev-pgdata:
