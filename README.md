@@ -3,9 +3,10 @@
 Your own platform, on your own machine. Point it at a Git repository and it
 builds, runs and exposes your app — no terminal after the installer.
 
-Status: **v0.1 feature-complete.** A clean Linux host goes from one command to a
-running, routed app without touching a terminal again. TLS for custom domains
-is the last piece (see [Roadmap](#roadmap-position)).
+Status: **v0.1–v0.4 built.** Install, deploy, one-click services, scaling and
+health, and backup/restore all work against a local cluster — see
+[Roadmap position](#roadmap-position) for what is done and what has not yet run
+on a real VPS.
 
 ## Install
 
@@ -243,19 +244,37 @@ record of the platform, so there is no one-click button for it.
 
 ## Roadmap position
 
-v0.1 is done when a clean VPS can go from `curl | bash` to a running app without
-touching a terminal again. What remains:
+- [x] **v0.1 — Install and deploy from the browser.** `curl | bash` installer
+      (K3s, in-cluster registry, Postgres, cert-manager, cabana), build-from-Git
+      deploys via BuildKit, live logs over SSE, TLS per app, sslip.io fallback.
+- [x] **v0.2 — One-click services.** A YAML catalogue of 17 databases, caches,
+      search engines, brokers and tools; generated credentials; link a service
+      to an app and its connection string is injected. StatefulSet workloads
+      (Kafka, ClickHouse) and bundled dependencies (Metabase + Postgres).
+- [x] **v0.3 — Scale and resilience.** Replica count and configurable health
+      checks, zero-downtime deploys, image rollback, and a per-replica health
+      panel (running / crashloop / OOM / restarts).
+- [x] **v0.4 — Backup and restore.** S3-compatible destination; per-service
+      logical dumps with daily/weekly scheduling and retention; a disaster-
+      recovery backup of cabana's own state (see [Disaster recovery](#disaster-recovery)).
 
-- [x] **K3s deployer** — BuildKit Job builds from the git context and pushes to
-      the in-cluster registry; Deployment/Service/Ingress applied; build and app
-      logs streamed live.
-- [x] **sslip.io fallback** — apps get a working hostname with no domain configured.
-- [x] **Installer** — [install.sh](install.sh) provisions K3s, the registry,
-      Postgres and cabana, then verifies it can log in before printing the
-      password. Idempotent: re-running upgrades in place.
-- [x] **TLS** — cert-manager installed by the installer, a certificate per app,
-      automatic renewal. Requires a real domain.
-- [ ] **Tarball upload** — the fallback deploy path for repos that are not public.
+What remains:
+
+- [ ] **v0.5 — CLI.** `cabana deploy`, `logs -f`, `scale`, `backup` over the
+      same API, plus an API token for CI/CD.
+- [ ] **v0.6 — Private Git and maintenance.** Deploy keys for private repos,
+      webhook deploys, in-panel self-upgrade.
+- [ ] **Tarball upload** — a deploy path for code not in a public repository.
+- [ ] **Broader catalogue** — services that still need more of the template
+      format (multi-node Kafka/Elasticsearch, external-DB tools like n8n).
+
+> **Not yet proven on real hardware.** Everything above is built and exercised
+> against a local k3d cluster, but the whole system has not run on a clean
+> Linux VPS. There is no published release yet, so `curl | bash` needs a binary
+> URL first; the amd64 build has been compiled but not run; and TLS has been
+> verified with a self-signed issuer, not a live Let's Encrypt certificate.
+> Restoring cabana's own state has been produced and validated as a dump but
+> not replayed onto a fresh install end to end.
 
 ### Installed layout
 
@@ -268,5 +287,3 @@ v0.1 needs no published container image. Everything else lives in K3s.
 | `/etc/cabana/cabana.env` | Configuration, mode 600 |
 | `/etc/cabana/kubeconfig` | ServiceAccount credential scoped by `rbac.yaml`, **not** cluster-admin |
 | `/etc/rancher/k3s/registries.yaml` | The containerd mirror, written before K3s starts |
-
-See [ROADMAP.MD](ROADMAP.MD) for v0.2 onwards.
